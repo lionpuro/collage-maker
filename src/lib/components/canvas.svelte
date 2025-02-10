@@ -2,6 +2,7 @@
 	import Konva from "konva";
 	import { onMount } from "svelte";
 	import { collage_templates } from "$lib/constants";
+	import type { TileConfig } from "$lib/constants/collage-templates";
 
 	type Props = {
 		resolution: { width: number; height: number };
@@ -21,6 +22,8 @@
 	let containerHeight: number = $state(resolution.height);
 	let borderConfig = $state({ width: 0, color: "#ffffff" });
 
+	let fileInput: HTMLInputElement | null = $state(null);
+
 	onMount(() => {
 		stage = new Konva.Stage({
 			container: "stage-container",
@@ -35,23 +38,12 @@
 		setDimensions();
 
 		layer = new Konva.Layer();
-		tr = new Konva.Transformer();
-
-		const circle = new Konva.Circle({
-			x: stage.width() / 2,
-			y: stage.height() / 2,
-			radius: 70,
-			fill: "red",
-			stroke: "black",
-			strokeWidth: 4,
-			draggable: true,
-		});
-		circle.on("mousedown touchstart", () => {
-			tr.nodes([circle]);
+		tr = new Konva.Transformer({
+			rotationSnaps: [0, 90, 180, 270],
+			enabledAnchors: ["top-left", "top-right", "bottom-left", "bottom-right"],
 		});
 
 		mainGroup = new Konva.Group();
-		mainGroup.add(circle);
 
 		layer.add(mainGroup);
 		layer.add(tr);
@@ -80,32 +72,105 @@
 		borderConfig.width = 0;
 	};
 
+	const handleImageUpload = (cell: Konva.Group) => {
+		if (!fileInput) return;
+		fileInput.onchange = async (e) => {
+			const input = e.target as HTMLInputElement;
+			if (!input.files) return;
+			const reader = new FileReader();
+			reader.readAsDataURL(input.files[0]);
+			reader.onload = (e: ProgressEvent<FileReader>) => {
+				if (!(e.target instanceof FileReader)) {
+					return;
+				}
+				if (!e.target.result) return;
+				const src = e.target.result.toString();
+				const image = new window.Image();
+				image.src = src;
+				image.onload = () => {
+					image.width = image.naturalWidth;
+					image.height = image.naturalHeight;
+					const scale = Math.max(cell.width() / image.width, cell.height() / image.height);
+					const size = { width: image.width * scale, height: image.height * scale };
+
+					const img = new Konva.Image({
+						image: image,
+						x: 0,
+						y: 0,
+						width: size.width,
+						height: size.height,
+						draggable: true,
+					});
+					img.on("mousedown touchstart", () => {
+						tr.nodes([img]);
+					});
+					cell.add(img);
+					cell.findOne(".cell-background")?.destroy();
+					cell.findOne(".cell-plus")?.destroy();
+					tr.nodes([img]);
+				};
+			};
+		};
+		fileInput.click();
+		fileInput.value = "";
+	};
+
+	const createCell = (conf: TileConfig) => {
+		const width = resolution.width * conf.width;
+		const height = resolution.height * conf.height;
+		const cell = new Konva.Group({
+			name: "cell",
+			x: resolution.width * conf.x,
+			y: resolution.height * conf.y,
+			width: width,
+			height: height,
+			clipWidth: resolution.width * conf.width,
+			clipHeight: resolution.height * conf.height,
+		});
+
+		const background = new Konva.Rect({
+			name: "cell-background",
+			x: 5,
+			y: 5,
+			width: width - 10,
+			height: height - 10,
+			fill: "#48484866",
+			draggable: false,
+		});
+		background.on("click", () => {
+			handleImageUpload(cell);
+		});
+		background.on("mouseenter", (e) => {
+			const container = e.target.getStage()?.container();
+			if (container) {
+				container.style.cursor = "pointer";
+			}
+		});
+		background.on("mouseleave", (e) => {
+			const container = e.target.getStage()?.container();
+			if (container) {
+				container.style.cursor = "default";
+			}
+		});
+
+		const plus = new Konva.Text({
+			name: "cell-plus",
+			text: "+",
+			fill: "#eee",
+			fontSize: 150,
+			listening: false,
+		});
+		plus.x((resolution.width * conf.width - plus.width()) / 2);
+		plus.y((resolution.height * conf.height - plus.height()) / 2);
+		cell.add(background);
+		cell.add(plus);
+		return cell;
+	};
 	$effect(() => {
 		clearStage();
 		const template = collage_templates[selectedTemplate];
 		template.config.forEach((conf) => {
-			const cell = new Konva.Group({
-				name: "cell",
-				x: resolution.width * conf.x,
-				y: resolution.height * conf.y,
-				width: resolution.width * conf.width,
-				height: resolution.height * conf.height,
-				clipWidth: resolution.width * conf.width,
-				clipHeight: resolution.height * conf.height,
-			});
-			const rect = new Konva.Rect({
-				name: "rect",
-				x: 0,
-				y: 0,
-				width: resolution.width * conf.width,
-				height: resolution.height * conf.height,
-				fill: "#" + ((Math.random() * 0xffffff) << 0).toString(16).padStart(6, "0"),
-				draggable: true,
-			});
-			rect.on("mousedown touchstart", () => {
-				tr.nodes([rect]);
-			});
-			cell.add(rect);
+			const cell = createCell(conf);
 			mainGroup.add(cell);
 		});
 	});
@@ -196,6 +261,9 @@
 		bind:clientWidth={containerWidth}
 		bind:clientHeight={containerHeight}
 	></div>
+</div>
+<div class="hidden">
+	<input bind:this={fileInput} type="file" accept="image/*" />
 </div>
 <input type="color" bind:value={borderConfig.color} onchange={changeBorderColor} />
 <input type="range" min={0} max={20} bind:value={borderConfig.width} onchange={changeBorderWidth} />
