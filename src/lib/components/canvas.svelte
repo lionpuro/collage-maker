@@ -90,8 +90,14 @@
 				image.onload = () => {
 					image.width = image.naturalWidth;
 					image.height = image.naturalHeight;
-					const scale = Math.max(cell.width() / image.width, cell.height() / image.height);
-					const size = { width: image.width * scale, height: image.height * scale };
+					const scale = Math.max(
+						cell.width() / image.width,
+						cell.height() / image.height,
+					);
+					const size = {
+						width: image.width * scale,
+						height: image.height * scale,
+					};
 
 					const img = new Konva.Image({
 						image: image,
@@ -253,18 +259,25 @@
 	id="container"
 	class="flex h-full min-h-0 w-full flex-col items-center justify-center"
 	bind:clientWidth={wrapperSize.width}
-	bind:clientHeight={wrapperSize.height}
->
+	bind:clientHeight={wrapperSize.height}>
 	<div
 		id="stage-container"
 		class="bg-base-800"
 		bind:clientWidth={containerWidth}
-		bind:clientHeight={containerHeight}
-	></div>
+		bind:clientHeight={containerHeight}>
+	</div>
 </div>
 <div class="hidden">
 	<input bind:this={fileInput} type="file" accept="image/*" />
 </div>
-<input type="color" bind:value={borderConfig.color} onchange={changeBorderColor} />
-<input type="range" min={0} max={20} bind:value={borderConfig.width} onchange={changeBorderWidth} />
+<input
+	type="color"
+	bind:value={borderConfig.color}
+	onchange={changeBorderColor} />
+<input
+	type="range"
+	min={0}
+	max={20}
+	bind:value={borderConfig.width}
+	onchange={changeBorderWidth} />
 <button onclick={() => downloadStage()}>Download</button>

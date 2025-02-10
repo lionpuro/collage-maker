@@ -3,7 +3,8 @@
 	"useTabs": true,
 	"singleQuote": false,
 	"trailingComma": "all",
-	"printWidth": 100,
+	"printWidth": 80,
+	"bracketSameLine": true,
 	"plugins": ["prettier-plugin-svelte", "prettier-plugin-tailwindcss"],
 	"overrides": [
 		{
