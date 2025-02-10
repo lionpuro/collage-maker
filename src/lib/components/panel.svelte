@@ -1,24 +1,38 @@
 <script lang="ts">
-	import { collage_templates } from "$lib/constants";
+	import type { Snippet } from "svelte";
 	let {
-		selectedTemplate,
-		selectTemplate,
-	}: { selectedTemplate: number; selectTemplate: (i: number) => void } = $props();
+		collageTab,
+		editTab,
+	}: {
+		collageTab: Snippet;
+		editTab: Snippet;
+	} = $props();
+	let currentTab = $state<"collage" | "edit">("collage");
 </script>
 
-<div class="flex flex-col gap-2 p-2">
-	<div class="flex flex-wrap gap-2 overflow-y-auto lg:content-start">
-		{#each collage_templates as template, index}
-			<button
-				onclick={() => selectTemplate(index)}
-				class="flex items-center justify-center rounded-lg p-4 hover:bg-base-800 hover:bg-opacity-50 max-lg:basis-1/5 lg:aspect-square lg:w-[calc(50%-0.25rem)] {selectedTemplate ===
-					index && 'bg-base-800'}"
-			>
-				<img src={template.icon} alt={template.name} />
-			</button>
-		{/each}
+<div class="flex h-full flex-col gap-2 p-2">
+	<div class="mb-2 flex">
+		<button
+			onclick={() => (currentTab = "collage")}
+			class="basis-1/2 border-b-2 p-2 font-medium
+				{currentTab === 'collage' ? 'border-rose-500' : 'border-base-600'}">
+			Collage
+		</button>
+		<button
+			onclick={() => (currentTab = "edit")}
+			class="basis-1/2 border-b-2 p-2 font-medium
+				{currentTab === 'edit' ? 'border-rose-500' : 'border-base-600'}">
+			Edit
+		</button>
 	</div>
-	<button class="h-fit rounded-lg bg-rose-500 p-2 font-medium lg:mt-auto lg:w-full">
+	{#if currentTab === "collage"}
+		{@render collageTab()}
+	{/if}
+	{#if currentTab === "edit"}
+		{@render editTab()}
+	{/if}
+	<button
+		class="h-fit rounded-lg bg-rose-500 p-2 font-medium lg:mt-auto lg:w-full">
 		Download
 	</button>
 </div>
