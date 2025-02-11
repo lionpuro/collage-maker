@@ -3,9 +3,11 @@
 	let {
 		collageTab,
 		editTab,
+		children,
 	}: {
 		collageTab: Snippet;
 		editTab: Snippet;
+		children: Snippet;
 	} = $props();
 	let currentTab = $state<"collage" | "edit">("collage");
 </script>
@@ -31,8 +33,5 @@
 	{#if currentTab === "edit"}
 		{@render editTab()}
 	{/if}
-	<button
-		class="h-fit rounded-lg bg-rose-500 p-2 font-medium lg:mt-auto lg:w-full">
-		Download
-	</button>
+	{@render children()}
 </div>
