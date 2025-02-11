@@ -146,12 +146,6 @@
 		currentTarget: EventTarget & T;
 	};
 
-	const changeBorderColor = (e: ChangeEvent<HTMLInputElement>) => {
-		const color = e.currentTarget.value;
-		const borders = layer.find(".border") as Konva.Rect[];
-		borders.forEach((child) => child.stroke(color));
-	};
-
 	const changeBorderWidth = (e: ChangeEvent<HTMLInputElement>) => {
 		const width = Number(e.currentTarget.value) * 10;
 		setBorders(resolution, mainGroup, width, borderConfig.color);
@@ -200,17 +194,6 @@
 		<div class="hidden">
 			<input bind:this={fileInput} type="file" accept="image/*" />
 		</div>
-		<input
-			type="color"
-			bind:value={borderConfig.color}
-			onchange={changeBorderColor} />
-		<input
-			type="range"
-			min={0}
-			max={20}
-			bind:value={borderConfig.width}
-			onchange={changeBorderWidth} />
-		<button onclick={() => downloadStage(stage, resolution)}>Download</button>
 	</div>
 	<div
 		class="flex flex-col border-base-800 bg-base-900 lg:w-[300px] lg:border-r">
@@ -228,7 +211,15 @@
 				</div>
 			{/snippet}
 			{#snippet editTab()}
-				<h2 class="font-semibold">Border</h2>
+				<div class="flex flex-col gap-2 overflow-y-auto lg:content-start">
+					<h2 class="font-medium">Border</h2>
+					<input
+						type="range"
+						min={0}
+						max={20}
+						bind:value={borderConfig.width}
+						oninput={changeBorderWidth} />
+				</div>
 			{/snippet}
 			<button
 				onclick={() => downloadStage(stage, resolution)}
