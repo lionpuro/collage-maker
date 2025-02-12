@@ -1,10 +1,16 @@
 <script lang="ts">
 	import Panel from "$lib/components/panel.svelte";
 	import Header from "$lib/components/header.svelte";
+	import LoadingOverlay from "$lib/components/loading-overlay.svelte";
 	import { collage_templates } from "$lib/constants";
 	import Konva from "konva";
 	import { onMount } from "svelte";
-	import { handleImageUpload, downloadStage, setBorders } from "$lib/utils";
+	import {
+		handleImageUpload,
+		exportingCollage,
+		stageToBlob,
+		setBorders,
+	} from "$lib/utils";
 	import type { TileConfig } from "$lib/constants/collage-templates";
 
 	let selectedTemplate = $state<number>(0);
@@ -150,6 +156,17 @@
 		const width = Number(e.currentTarget.value) * 10;
 		setBorders(resolution, mainGroup, width, borderConfig.color);
 	};
+
+	const handleDownload = async () => {
+		const blob = await stageToBlob(stage, resolution);
+		if (!blob) return;
+		const dataURL = URL.createObjectURL(blob);
+		const link = document.createElement("a");
+		link.href = dataURL;
+		link.download = "collage.png";
+		link.click();
+		exportingCollage.set(false);
+	};
 </script>
 
 <Header>
@@ -222,10 +239,12 @@
 				</div>
 			{/snippet}
 			<button
-				onclick={() => downloadStage(stage, resolution)}
-				class="h-fit rounded-lg bg-rose-500 p-2 font-medium lg:mt-auto lg:w-full">
+				disabled={$exportingCollage}
+				onclick={handleDownload}
+				class="h-fit rounded-lg bg-rose-500 p-2 font-medium disabled:bg-base-600 lg:mt-auto lg:w-full">
 				Download
 			</button>
 		</Panel>
 	</div>
 </div>
+<LoadingOverlay loading={$exportingCollage} />

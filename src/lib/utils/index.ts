@@ -1,2 +1,7 @@
-import { handleImageUpload, downloadStage, setBorders } from "./konva-utils";
-export { handleImageUpload, downloadStage, setBorders };
+import {
+	handleImageUpload,
+	exportingCollage,
+	stageToBlob,
+	setBorders,
+} from "./konva-utils";
+export { handleImageUpload, exportingCollage, stageToBlob, setBorders };

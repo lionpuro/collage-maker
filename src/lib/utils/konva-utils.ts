@@ -1,11 +1,18 @@
 import type { Resolution } from "$lib/types";
 import Konva from "konva";
+import { writable, type Writable } from "svelte/store";
 
-export function downloadStage(stage: Konva.Stage, resolution: Resolution) {
+export const exportingCollage: Writable<boolean> = writable(false);
+
+export async function stageToBlob(
+	stage: Konva.Stage,
+	resolution: Resolution,
+): Promise<Blob | null> {
+	exportingCollage.set(true);
 	const mainGroup = stage.findOne(".main-group");
 	const container = stage.container();
 	if (!mainGroup || !container) {
-		return;
+		return null;
 	}
 
 	const ratio = resolution.height / resolution.width;
@@ -15,18 +22,15 @@ export function downloadStage(stage: Konva.Stage, resolution: Resolution) {
 	);
 	stage.scale({ x: 1, y: 1 });
 
-	const dataURL = mainGroup.toDataURL({
+	const blob = mainGroup.toBlob({
 		x: mainGroup.x(),
 		y: mainGroup.y(),
 		width: resolution.width,
 		height: resolution.height,
-	});
-	stage.scale({ x: scale, y: scale });
+	}) as Promise<Blob>;
 
-	const link = document.createElement("a");
-	link.href = dataURL;
-	link.download = "collage.png";
-	link.click();
+	stage.scale({ x: scale, y: scale });
+	return blob;
 }
 
 export function handleImageUpload(
