@@ -178,7 +178,9 @@
 					id="width"
 					class="w-16 rounded-md bg-base-800 text-center font-medium"
 					type="numeric"
-					bind:value={resolution.width} />
+					value={resolution.width}
+					onchange={(e) =>
+						(resolution.width = Number(e.currentTarget.value))} />
 			</span>
 		</div>
 
@@ -189,7 +191,9 @@
 					id="height"
 					class="w-16 rounded-md bg-base-800 text-center font-medium"
 					type="numeric"
-					bind:value={resolution.height} />
+					value={resolution.height}
+					onchange={(e) =>
+						(resolution.height = Number(e.currentTarget.value))} />
 			</span>
 		</div>
 	</div>
