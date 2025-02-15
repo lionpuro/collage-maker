@@ -31,7 +31,7 @@
 			Edit
 		</button>
 	</div>
-	<div class="flex flex-col gap-2 overflow-y-auto p-2">
+	<div class="flex flex-col gap-4 overflow-y-auto p-4">
 		{#if currentTab === "collage"}
 			{@render collageTab()}
 		{/if}
@@ -39,7 +39,7 @@
 			{@render editTab()}
 		{/if}
 	</div>
-	<div class="flex flex-col p-2 lg:mt-auto lg:w-full">
+	<div class="flex flex-col border-t border-base-800 p-2 lg:mt-auto lg:w-full">
 		{@render children()}
 	</div>
 </div>

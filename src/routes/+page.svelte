@@ -15,6 +15,13 @@
 
 	let selectedTemplate = $state<number>(0);
 	let resolution = $state({ width: 3000, height: 2000 });
+	let orientation = $derived<"square" | "landscape" | "portrait">(
+		resolution.width === resolution.height
+			? "square"
+			: resolution.width > resolution.height
+				? "landscape"
+				: "portrait",
+	);
 
 	let stage: Konva.Stage;
 	let layer: Konva.Layer;
@@ -22,8 +29,8 @@
 	let tr: Konva.Transformer;
 
 	let wrapperSize = $state({ width: 0, height: 0 });
-	let containerWidth: number = $state(resolution.width);
-	let containerHeight: number = $state(resolution.height);
+	let containerWidth: number = $state(0);
+	let containerHeight: number = $state(0);
 	let borderConfig = $state({ width: 0, color: "#ffffff" });
 
 	let fileInput: HTMLInputElement | null = $state(null);
@@ -167,11 +174,19 @@
 		link.click();
 		exportingCollage.set(false);
 	};
+
+	const changeOrientation = (val: typeof orientation) => {
+		if (orientation === val) {
+			return;
+		}
+		resolution = { width: resolution.height, height: resolution.width };
+	};
 </script>
 
 <Header></Header>
 <div class="flex h-full min-h-0 flex-col lg:flex-row-reverse">
-	<div class="flex h-full w-full min-w-0 flex-col bg-[#1d1d20] lg:p-4">
+	<div
+		class="flex h-full min-h-0 w-full min-w-0 flex-col bg-[#1d1d20] p-1 lg:p-4">
 		<div
 			id="container"
 			class="flex h-full min-h-0 w-full flex-col items-center justify-center"
@@ -198,7 +213,7 @@
 						<span class="flex w-full items-center rounded-md">
 							<input
 								id="width"
-								class="w-full rounded-md border border-base-700 bg-transparent text-center font-medium"
+								class="w-full rounded-md border border-base-700 bg-transparent px-2 py-0.5 font-medium"
 								type="numeric"
 								value={resolution.width}
 								onchange={(e) =>
@@ -211,7 +226,7 @@
 						<span class="flex w-full items-center rounded-md">
 							<input
 								id="height"
-								class="w-full rounded-md border border-base-700 bg-transparent text-center font-medium"
+								class="w-full rounded-md border border-base-700 bg-transparent px-2 py-0.5 font-medium"
 								type="numeric"
 								value={resolution.height}
 								onchange={(e) =>
@@ -219,19 +234,43 @@
 						</span>
 					</div>
 				</div>
-				<div class="flex flex-wrap gap-2 overflow-y-auto lg:content-start">
+				<div class="flex flex-col gap-2">
+					<span class="text-sm font-medium">Orientation</span>
+					<div
+						class="flex gap-0.5 overflow-hidden rounded-md bg-base-800 p-0.5">
+						<button
+							disabled={orientation === "square"}
+							class="flex basis-1/2 items-center justify-center rounded py-1
+							text-sm font-medium disabled:bg-base-800 disabled:text-base-500
+							{orientation === 'landscape' && 'bg-rose-500'}"
+							onclick={() => changeOrientation("landscape")}>
+							Landscape
+						</button>
+						<button
+							disabled={orientation === "square"}
+							class="flex basis-1/2 items-center justify-center rounded py-1
+							text-sm font-medium disabled:bg-base-800 disabled:text-base-500
+							{orientation === 'portrait' && 'bg-rose-500'}"
+							onclick={() => changeOrientation("portrait")}>
+							Portrait
+						</button>
+					</div>
+				</div>
+				<span class="font-semibold">Layout</span>
+				<div
+					class="flex max-h-16 flex-wrap gap-2 max-lg:flex-col max-lg:overflow-x-auto sm:max-h-36 lg:max-h-none lg:content-start lg:overflow-y-auto">
 					{#each collage_templates as template, index}
 						<button
 							onclick={() => (selectedTemplate = index)}
-							class="flex items-center justify-center rounded-lg p-4 hover:bg-base-800 hover:bg-opacity-50 max-lg:basis-1/5 lg:aspect-square lg:w-[calc(50%-0.25rem)] {selectedTemplate ===
-								index && 'bg-base-800'}">
+							class="flex items-center justify-center rounded-lg p-4 hover:bg-base-800 hover:bg-opacity-50 max-lg:flex-col max-sm:h-full sm:h-[calc(50%-0.25rem)] lg:aspect-square lg:h-auto lg:w-[calc(50%-0.25rem)]
+							{selectedTemplate === index && 'bg-base-800'}">
 							<img src={template.icon} alt={template.name} />
 						</button>
 					{/each}
 				</div>
 			{/snippet}
 			{#snippet editTab()}
-				<div class="flex flex-col gap-2 overflow-y-auto lg:content-start">
+				<div class="flex flex-col gap-2 overflow-y-auto p-2 lg:content-start">
 					<h2 class="font-medium">Border</h2>
 					<input
 						type="range"
