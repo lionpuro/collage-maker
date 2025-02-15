@@ -169,35 +169,7 @@
 	};
 </script>
 
-<Header>
-	<div class="flex gap-8">
-		<div class="flex items-center gap-2">
-			<label for="width" class="text-sm font-medium">w:</label>
-			<span class="flex items-center rounded-md">
-				<input
-					id="width"
-					class="w-16 rounded-md bg-base-800 text-center font-medium"
-					type="numeric"
-					value={resolution.width}
-					onchange={(e) =>
-						(resolution.width = Number(e.currentTarget.value))} />
-			</span>
-		</div>
-
-		<div class="flex items-center gap-2">
-			<label for="height" class="text-sm font-medium">h:</label>
-			<span class="flex items-center rounded-md">
-				<input
-					id="height"
-					class="w-16 rounded-md bg-base-800 text-center font-medium"
-					type="numeric"
-					value={resolution.height}
-					onchange={(e) =>
-						(resolution.height = Number(e.currentTarget.value))} />
-			</span>
-		</div>
-	</div>
-</Header>
+<Header></Header>
 <div class="flex h-full min-h-0 flex-col lg:flex-row-reverse">
 	<div class="flex h-full w-full min-w-0 flex-col bg-[#1d1d20] lg:p-4">
 		<div
@@ -220,6 +192,33 @@
 		class="flex flex-col border-base-800 bg-base-900 lg:w-[300px] lg:border-r">
 		<Panel>
 			{#snippet collageTab()}
+				<div class="flex gap-2">
+					<div class="flex basis-1/2 flex-col gap-2">
+						<label for="width" class="text-sm font-medium">Width</label>
+						<span class="flex w-full items-center rounded-md">
+							<input
+								id="width"
+								class="w-full rounded-md border border-base-700 bg-transparent text-center font-medium"
+								type="numeric"
+								value={resolution.width}
+								onchange={(e) =>
+									(resolution.width = Number(e.currentTarget.value))} />
+						</span>
+					</div>
+
+					<div class="flex basis-1/2 flex-col gap-2">
+						<label for="height" class="text-sm font-medium">Height</label>
+						<span class="flex w-full items-center rounded-md">
+							<input
+								id="height"
+								class="w-full rounded-md border border-base-700 bg-transparent text-center font-medium"
+								type="numeric"
+								value={resolution.height}
+								onchange={(e) =>
+									(resolution.height = Number(e.currentTarget.value))} />
+						</span>
+					</div>
+				</div>
 				<div class="flex flex-wrap gap-2 overflow-y-auto lg:content-start">
 					{#each collage_templates as template, index}
 						<button
