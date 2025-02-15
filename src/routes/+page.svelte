@@ -98,7 +98,7 @@
 			fill: "#48484866",
 			draggable: false,
 		});
-		background.on("click", () => {
+		background.on("click tap", () => {
 			if (!fileInput) return;
 			handleImageUpload(fileInput, cell, tr);
 		});
