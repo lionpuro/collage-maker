@@ -245,7 +245,7 @@
 			<button
 				disabled={$exportingCollage}
 				onclick={handleDownload}
-				class="h-fit rounded-lg bg-rose-500 p-2 font-medium disabled:bg-base-600 lg:mt-auto lg:w-full">
+				class="h-fit rounded-lg bg-rose-500 p-2 font-medium disabled:bg-base-600">
 				Download
 			</button>
 		</Panel>
