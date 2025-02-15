@@ -12,6 +12,8 @@
 		setBorders,
 	} from "$lib/utils";
 	import type { TileConfig } from "$lib/constants/collage-templates";
+	import { mediaQueryStore } from "$lib/stores";
+	const lgViewport = mediaQueryStore("(min-width: 1024px)");
 
 	let selectedTemplate = $state<number>(0);
 	let resolution = $state({ width: 3000, height: 2000 });
@@ -183,7 +185,19 @@
 	};
 </script>
 
-<Header></Header>
+<Header>
+	{#if !$lgViewport}
+		<div class="flex p-2">
+			<button
+				disabled={$exportingCollage}
+				onclick={handleDownload}
+				class="rounded-md bg-rose-500 px-3 text-sm font-semibold disabled:bg-base-600"
+			>
+				Download
+			</button>
+		</div>
+	{/if}
+</Header>
 <div class="flex h-full min-h-0 flex-col lg:flex-row-reverse">
 	<div
 		class="flex h-full min-h-0 w-full min-w-0 flex-col bg-[#1d1d20] p-1 lg:p-4"
@@ -291,13 +305,19 @@
 					/>
 				</div>
 			{/snippet}
-			<button
-				disabled={$exportingCollage}
-				onclick={handleDownload}
-				class="h-fit rounded-lg bg-rose-500 p-2 font-medium disabled:bg-base-600"
-			>
-				Download
-			</button>
+			{#if $lgViewport}
+				<div
+					class="flex flex-col border-t border-base-800 p-2 lg:mt-auto lg:w-full"
+				>
+					<button
+						disabled={$exportingCollage}
+						onclick={handleDownload}
+						class="h-fit rounded-lg bg-rose-500 p-2 font-medium disabled:bg-base-600"
+					>
+						Download
+					</button>
+				</div>
+			{/if}
 		</Panel>
 	</div>
 </div>

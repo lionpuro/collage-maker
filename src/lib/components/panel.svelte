@@ -41,7 +41,5 @@
 			{@render editTab()}
 		{/if}
 	</div>
-	<div class="flex flex-col border-t border-base-800 p-2 lg:mt-auto lg:w-full">
-		{@render children()}
-	</div>
+	{@render children()}
 </div>
