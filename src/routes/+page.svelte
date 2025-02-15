@@ -233,7 +233,7 @@
 					<input
 						type="range"
 						min={0}
-						max={20}
+						max={40}
 						bind:value={borderConfig.width}
 						oninput={changeBorderWidth} />
 				</div>
