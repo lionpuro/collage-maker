@@ -21,13 +21,15 @@
 		<button
 			onclick={() => (currentTab = "collage")}
 			class="basis-1/2 p-2 font-medium
-				{currentTab === 'collage' ? activeClass : 'text-base-400'}">
+				{currentTab === 'collage' ? activeClass : 'text-base-400'}"
+		>
 			Collage
 		</button>
 		<button
 			onclick={() => (currentTab = "edit")}
 			class="basis-1/2 p-2 font-medium
-				{currentTab === 'edit' ? activeClass : 'text-base-400'}">
+				{currentTab === 'edit' ? activeClass : 'text-base-400'}"
+		>
 			Edit
 		</button>
 	</div>

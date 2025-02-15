@@ -186,25 +186,28 @@
 <Header></Header>
 <div class="flex h-full min-h-0 flex-col lg:flex-row-reverse">
 	<div
-		class="flex h-full min-h-0 w-full min-w-0 flex-col bg-[#1d1d20] p-1 lg:p-4">
+		class="flex h-full min-h-0 w-full min-w-0 flex-col bg-[#1d1d20] p-1 lg:p-4"
+	>
 		<div
 			id="container"
 			class="flex h-full min-h-0 w-full flex-col items-center justify-center"
 			bind:clientWidth={wrapperSize.width}
-			bind:clientHeight={wrapperSize.height}>
+			bind:clientHeight={wrapperSize.height}
+		>
 			<div
 				id="stage-container"
 				class="bg-base-800"
 				bind:clientWidth={containerWidth}
-				bind:clientHeight={containerHeight}>
-			</div>
+				bind:clientHeight={containerHeight}
+			></div>
 		</div>
 		<div class="hidden">
 			<input bind:this={fileInput} type="file" accept="image/*" />
 		</div>
 	</div>
 	<div
-		class="flex flex-col border-base-800 bg-base-900 lg:w-[300px] lg:border-r">
+		class="flex flex-col border-base-800 bg-base-900 lg:w-[300px] lg:border-r"
+	>
 		<Panel>
 			{#snippet collageTab()}
 				<div class="flex gap-2">
@@ -217,7 +220,8 @@
 								type="numeric"
 								value={resolution.width}
 								onchange={(e) =>
-									(resolution.width = Number(e.currentTarget.value))} />
+									(resolution.width = Number(e.currentTarget.value))}
+							/>
 						</span>
 					</div>
 
@@ -230,20 +234,23 @@
 								type="numeric"
 								value={resolution.height}
 								onchange={(e) =>
-									(resolution.height = Number(e.currentTarget.value))} />
+									(resolution.height = Number(e.currentTarget.value))}
+							/>
 						</span>
 					</div>
 				</div>
 				<div class="flex flex-col gap-2">
 					<span class="text-sm font-medium">Orientation</span>
 					<div
-						class="flex gap-0.5 overflow-hidden rounded-md bg-base-800 p-0.5">
+						class="flex gap-0.5 overflow-hidden rounded-md bg-base-800 p-0.5"
+					>
 						<button
 							disabled={orientation === "square"}
 							class="flex basis-1/2 items-center justify-center rounded py-1
 							text-sm font-medium disabled:bg-base-800 disabled:text-base-500
 							{orientation === 'landscape' && 'bg-rose-500'}"
-							onclick={() => changeOrientation("landscape")}>
+							onclick={() => changeOrientation("landscape")}
+						>
 							Landscape
 						</button>
 						<button
@@ -251,19 +258,22 @@
 							class="flex basis-1/2 items-center justify-center rounded py-1
 							text-sm font-medium disabled:bg-base-800 disabled:text-base-500
 							{orientation === 'portrait' && 'bg-rose-500'}"
-							onclick={() => changeOrientation("portrait")}>
+							onclick={() => changeOrientation("portrait")}
+						>
 							Portrait
 						</button>
 					</div>
 				</div>
 				<span class="font-semibold">Layout</span>
 				<div
-					class="flex max-h-16 flex-wrap gap-2 max-lg:flex-col max-lg:overflow-x-auto sm:max-h-36 lg:max-h-none lg:content-start lg:overflow-y-auto">
+					class="flex max-h-16 flex-wrap gap-2 max-lg:flex-col max-lg:overflow-x-auto sm:max-h-36 lg:max-h-none lg:content-start lg:overflow-y-auto"
+				>
 					{#each collage_templates as template, index}
 						<button
 							onclick={() => (selectedTemplate = index)}
 							class="flex items-center justify-center rounded-lg p-4 hover:bg-base-800 hover:bg-opacity-50 max-lg:flex-col max-sm:h-full sm:h-[calc(50%-0.25rem)] lg:aspect-square lg:h-auto lg:w-[calc(50%-0.25rem)]
-							{selectedTemplate === index && 'bg-base-800'}">
+							{selectedTemplate === index && 'bg-base-800'}"
+						>
 							<img src={template.icon} alt={template.name} />
 						</button>
 					{/each}
@@ -277,13 +287,15 @@
 						min={0}
 						max={40}
 						bind:value={borderConfig.width}
-						oninput={changeBorderWidth} />
+						oninput={changeBorderWidth}
+					/>
 				</div>
 			{/snippet}
 			<button
 				disabled={$exportingCollage}
 				onclick={handleDownload}
-				class="h-fit rounded-lg bg-rose-500 p-2 font-medium disabled:bg-base-600">
+				class="h-fit rounded-lg bg-rose-500 p-2 font-medium disabled:bg-base-600"
+			>
 				Download
 			</button>
 		</Panel>
