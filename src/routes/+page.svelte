@@ -43,6 +43,8 @@
 
 	let fileInput: HTMLInputElement | null = $state(null);
 
+	let imageCount = $state(0);
+
 	const selectNode = (node: Konva.Node | null) => {
 		if (!node) {
 			tr.nodes([]);
@@ -104,6 +106,7 @@
 		borderConfig.width = 0;
 		resetFilters();
 		layer.getCanvas()._canvas.style.filter = "none";
+		imageCount = 0;
 	};
 
 	const createCell = (conf: TileConfig) => {
@@ -131,6 +134,7 @@
 		background.on("click tap", () => {
 			if (!fileInput) return;
 			handleImageUpload(fileInput, cell, selectNode);
+			imageCount = imageCount + 1;
 		});
 		background.on("mouseenter", (e) => {
 			const container = e.target.getStage()?.container();
@@ -331,7 +335,11 @@
 						value={borderConfig.width}
 						oninput={changeBorderWidth}
 					/>
-					<Filters canvas={layer.getCanvas()._canvas} />
+					<Filters
+						canvas={layer.getCanvas()._canvas}
+						disabled={imageCount <
+							collage_templates[selectedTemplate].config.length}
+					/>
 				</div>
 			{/snippet}
 			{#if $lgViewport}

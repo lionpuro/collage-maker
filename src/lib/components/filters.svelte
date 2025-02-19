@@ -6,7 +6,8 @@
 		setFilterValue,
 		type FilterKey,
 	} from "$lib/stores/filter-store.svelte";
-	let { canvas }: { canvas: HTMLCanvasElement } = $props();
+	let { canvas, disabled }: { canvas: HTMLCanvasElement; disabled: boolean } =
+		$props();
 
 	const updateFilter = (key: FilterKey, value: number) => {
 		if (!canvas) {
@@ -25,6 +26,7 @@
 	max={200}
 	defaultvalue={100}
 	step={1}
+	{disabled}
 />
 <Slider
 	label="Contrast"
@@ -34,6 +36,7 @@
 	max={200}
 	defaultvalue={100}
 	step={1}
+	{disabled}
 />
 <Slider
 	label="Saturation"
@@ -43,4 +46,5 @@
 	max={200}
 	defaultvalue={100}
 	step={1}
+	{disabled}
 />
