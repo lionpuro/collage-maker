@@ -16,7 +16,7 @@
 	after:content-['_'] after:bg-rose-500 after:h-0.5 after:w-full`;
 </script>
 
-<div class="flex h-full flex-col gap-2">
+<div class="flex h-full flex-col">
 	<div class="flex border-b border-base-800">
 		<button
 			onclick={() => (currentTab = "collage")}

@@ -1,2 +1,3 @@
 import mediaQueryStore from "./media-query";
-export { mediaQueryStore };
+import { filterValues } from "./filter-store.svelte";
+export { mediaQueryStore, filterValues };

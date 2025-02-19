@@ -4,17 +4,18 @@ import { writable, type Writable } from "svelte/store";
 
 export const exportingCollage: Writable<boolean> = writable(false);
 
-export async function stageToBlob(
-	stage: Konva.Stage,
+export async function exportCollage(
+	imageLayer: Konva.Layer,
+	topLayer: Konva.Layer,
 	resolution: Resolution,
+	filter: string,
 ): Promise<Blob | null> {
 	exportingCollage.set(true);
-	const mainGroup = stage.findOne(".main-group");
-	const container = stage.container();
-	if (!mainGroup || !container) {
+	const stage = imageLayer.getStage();
+	const container = stage?.container();
+	if (!stage || !container) {
 		return null;
 	}
-
 	const ratio = resolution.height / resolution.width;
 	const scale = Math.min(
 		container.clientWidth / resolution.width,
@@ -22,21 +23,50 @@ export async function stageToBlob(
 	);
 	stage.scale({ x: 1, y: 1 });
 
-	const blob = mainGroup.toBlob({
-		x: mainGroup.x(),
-		y: mainGroup.y(),
+	const canvasConfig = {
+		x: 0,
+		y: 0,
 		width: resolution.width,
 		height: resolution.height,
-	}) as Promise<Blob>;
+	};
+	const borders = topLayer.toCanvas(canvasConfig);
+	const canvas = imageLayer.toCanvas(canvasConfig);
+	const ctx = canvas?.getContext("2d");
+	if (!canvas || !ctx) {
+		return null;
+	}
+	ctx.filter = filter;
+	ctx.drawImage(canvas, 0, 0);
+
+	const imgBlob = await canvasToBlob(canvas);
+	if (!imgBlob) {
+		return null;
+	}
+
+	const images = await asyncImage(URL.createObjectURL(imgBlob));
+
+	const resultCanvas = document.createElement("canvas");
+	resultCanvas.width = resolution.width;
+	resultCanvas.height = resolution.height;
+
+	const resultCtx = resultCanvas.getContext("2d");
+	if (!resultCtx) {
+		return null;
+	}
+	resultCtx.drawImage(images, 0, 0);
+	resultCtx.drawImage(borders, 0, 0);
+
+	const result = await canvasToBlob(resultCanvas);
 
 	stage.scale({ x: scale, y: scale });
-	return blob;
+
+	return result;
 }
 
 export function handleImageUpload(
 	fileInput: HTMLInputElement,
 	cell: Konva.Group,
-	tr: Konva.Transformer,
+	onSelect: (node: Konva.Node | null) => void,
 ) {
 	fileInput.onchange = async (e) => {
 		const input = e.target as HTMLInputElement;
@@ -64,6 +94,7 @@ export function handleImageUpload(
 				};
 
 				const img = new Konva.Image({
+					name: "image",
 					image: image,
 					x: 0,
 					y: 0,
@@ -72,12 +103,12 @@ export function handleImageUpload(
 					draggable: true,
 				});
 				img.on("mousedown touchstart", () => {
-					tr.nodes([img]);
+					onSelect(img);
 				});
 				cell.add(img);
 				cell.findOne(".cell-background")?.destroy();
 				cell.findOne(".cell-plus")?.destroy();
-				tr.nodes([img]);
+				onSelect(img);
 			};
 		};
 	};
@@ -91,8 +122,8 @@ export function setBorders(
 	width: number,
 	color: string,
 ) {
-	const layer = group.getLayer();
-	if (!layer) return;
+	const stage = group.getStage();
+	if (!stage) return;
 	group.find(".border").forEach((node) => node.destroy());
 	const outerBorder = new Konva.Rect({
 		name: "border",
@@ -105,20 +136,37 @@ export function setBorders(
 		listening: false,
 	});
 	group.add(outerBorder);
-	group.find(".cell").forEach((shape) => {
+	stage.find(".cell").forEach((shape) => {
 		if (shape.getType() === "Group") {
 			const cell = shape as Konva.Group;
 			const border = new Konva.Rect({
 				name: "border",
-				x: 0,
-				y: 0,
+				x: cell.x(),
+				y: cell.y(),
 				width: cell.width(),
 				height: cell.height(),
 				strokeWidth: width,
 				stroke: color,
 				listening: false,
 			});
-			cell.add(border);
+			group.add(border);
 		}
+	});
+}
+
+async function canvasToBlob(canvas: HTMLCanvasElement) {
+	return new Promise<Blob | null>((resolve) => {
+		canvas.toBlob((blob) => resolve(blob));
+	});
+}
+
+async function asyncImage(src: string) {
+	return new Promise<HTMLImageElement>((resolve, reject) => {
+		const image = new Image();
+		image.onload = () => resolve(image);
+		image.onerror = () => reject;
+		image.width = image.naturalWidth;
+		image.height = image.naturalHeight;
+		image.src = src;
 	});
 }

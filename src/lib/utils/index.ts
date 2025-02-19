@@ -1,7 +1,7 @@
 import {
 	handleImageUpload,
 	exportingCollage,
-	stageToBlob,
+	exportCollage,
 	setBorders,
 } from "./konva-utils";
-export { handleImageUpload, exportingCollage, stageToBlob, setBorders };
+export { handleImageUpload, exportCollage, exportingCollage, setBorders };

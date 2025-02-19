@@ -8,11 +8,15 @@
 	import {
 		handleImageUpload,
 		exportingCollage,
-		stageToBlob,
+		exportCollage,
 		setBorders,
 	} from "$lib/utils";
 	import type { TileConfig } from "$lib/constants/collage-templates";
 	import { mediaQueryStore } from "$lib/stores";
+	import Filters from "$lib/components/filters.svelte";
+	import Slider from "$lib/components/slider.svelte";
+	import { getFilterString } from "$lib/stores/filter-store.svelte";
+	import { resetFilters } from "$lib/stores/filter-store.svelte";
 	const lgViewport = mediaQueryStore("(min-width: 1024px)");
 
 	let selectedTemplate = $state<number>(0);
@@ -26,8 +30,10 @@
 	);
 
 	let stage: Konva.Stage;
-	let layer: Konva.Layer;
+	let layer: Konva.Layer = new Konva.Layer();
+	let topLayer: Konva.Layer;
 	let mainGroup: Konva.Group;
+	let borderGroup: Konva.Group;
 	let tr: Konva.Transformer;
 
 	let wrapperSize = $state({ width: 0, height: 0 });
@@ -37,6 +43,14 @@
 
 	let fileInput: HTMLInputElement | null = $state(null);
 
+	const selectNode = (node: Konva.Node | null) => {
+		if (!node) {
+			tr.nodes([]);
+			return;
+		}
+		tr.nodes([node]);
+	};
+
 	onMount(() => {
 		stage = new Konva.Stage({
 			container: "stage-container",
@@ -45,23 +59,27 @@
 		});
 		stage.on("mousedown touchstart", (e) => {
 			if (e.target === stage) {
-				return tr.nodes([]);
+				return selectNode(null);
 			}
 		});
 		resizeCanvas();
 
-		layer = new Konva.Layer();
+		topLayer = new Konva.Layer({ id: "top-layer" });
+
 		tr = new Konva.Transformer({
 			rotationSnaps: [0, 90, 180, 270],
 			enabledAnchors: ["top-left", "top-right", "bottom-left", "bottom-right"],
 		});
 
 		mainGroup = new Konva.Group({ name: "main-group" });
-
 		layer.add(mainGroup);
-		layer.add(tr);
+
+		borderGroup = new Konva.Group({ id: "border-group" });
+		topLayer.add(borderGroup);
+		topLayer.add(tr);
 
 		stage.add(layer);
+		stage.add(topLayer);
 		layer.draw();
 	});
 
@@ -77,12 +95,15 @@
 	});
 
 	const clearStage = () => {
-		tr.nodes([]);
-		const nodesToDestroy = mainGroup
-			.getChildren()
-			.filter((node) => node.name() === "cell" || node.name() === "border");
+		selectNode(null);
+		const nodesToDestroy = [
+			...mainGroup.getChildren().filter((node) => node.name() === "cell"),
+			...borderGroup.getChildren().filter((node) => node.name() === "border"),
+		];
 		nodesToDestroy.forEach((node) => node.destroy());
 		borderConfig.width = 0;
+		resetFilters();
+		layer.getCanvas()._canvas.style.filter = "none";
 	};
 
 	const createCell = (conf: TileConfig) => {
@@ -109,7 +130,7 @@
 		});
 		background.on("click tap", () => {
 			if (!fileInput) return;
-			handleImageUpload(fileInput, cell, tr);
+			handleImageUpload(fileInput, cell, selectNode);
 		});
 		background.on("mouseenter", (e) => {
 			const container = e.target.getStage()?.container();
@@ -163,11 +184,14 @@
 
 	const changeBorderWidth = (e: ChangeEvent<HTMLInputElement>) => {
 		const width = Number(e.currentTarget.value) * 10;
-		setBorders(resolution, mainGroup, width, borderConfig.color);
+		borderConfig.width = Number(e.currentTarget.value);
+		setBorders(resolution, borderGroup, width, borderConfig.color);
 	};
 
 	const handleDownload = async () => {
-		const blob = await stageToBlob(stage, resolution);
+		tr.hide();
+		const filter = getFilterString();
+		const blob = await exportCollage(layer, topLayer, resolution, filter);
 		if (!blob) return;
 		const dataURL = URL.createObjectURL(blob);
 		const link = document.createElement("a");
@@ -175,6 +199,7 @@
 		link.download = "collage.png";
 		link.click();
 		exportingCollage.set(false);
+		tr.show();
 	};
 
 	const changeOrientation = (val: typeof orientation) => {
@@ -210,7 +235,7 @@
 		>
 			<div
 				id="stage-container"
-				class="bg-base-800"
+				class="bg-base-800 {$exportingCollage && 'opacity-0'}"
 				bind:clientWidth={containerWidth}
 				bind:clientHeight={containerHeight}
 			></div>
@@ -280,7 +305,7 @@
 				</div>
 				<span class="font-semibold">Layout</span>
 				<div
-					class="flex max-h-16 flex-wrap gap-2 max-lg:flex-col max-lg:overflow-x-auto sm:max-h-36 lg:max-h-none lg:content-start lg:overflow-y-auto"
+					class="flex max-h-16 flex-wrap gap-2 max-lg:flex-col max-lg:overflow-x-auto sm:max-h-36 lg:max-h-none lg:content-start"
 				>
 					{#each collage_templates as template, index}
 						<button
@@ -294,15 +319,19 @@
 				</div>
 			{/snippet}
 			{#snippet editTab()}
-				<div class="flex flex-col gap-2 overflow-y-auto p-2 lg:content-start">
-					<h2 class="font-medium">Border</h2>
-					<input
-						type="range"
+				<div
+					class="flex flex-col gap-2 overflow-y-auto max-lg:px-2 lg:content-start"
+				>
+					<Slider
+						label="Border"
+						displayValue={Math.round((borderConfig.width / 40) * 100) + "%"}
 						min={0}
 						max={40}
-						bind:value={borderConfig.width}
+						step={0.4}
+						value={borderConfig.width}
 						oninput={changeBorderWidth}
 					/>
+					<Filters canvas={layer.getCanvas()._canvas} />
 				</div>
 			{/snippet}
 			{#if $lgViewport}
