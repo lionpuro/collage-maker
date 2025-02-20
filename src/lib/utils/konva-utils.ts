@@ -1,8 +1,6 @@
+import { exporting } from "$lib/stores";
 import type { Resolution } from "$lib/types";
 import Konva from "konva";
-import { writable, type Writable } from "svelte/store";
-
-export const exportingCollage: Writable<boolean> = writable(false);
 
 export async function exportCollage(
 	imageLayer: Konva.Layer,
@@ -10,7 +8,7 @@ export async function exportCollage(
 	resolution: Resolution,
 	filter: string,
 ): Promise<Blob | null> {
-	exportingCollage.set(true);
+	exporting.set(true);
 	const stage = imageLayer.getStage();
 	const container = stage?.container();
 	if (!stage || !container) {

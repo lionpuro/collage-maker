@@ -5,14 +5,9 @@
 	import { collage_templates } from "$lib/constants";
 	import Konva from "konva";
 	import { onMount } from "svelte";
-	import {
-		handleImageUpload,
-		exportingCollage,
-		exportCollage,
-		setBorders,
-	} from "$lib/utils";
+	import { handleImageUpload, exportCollage, setBorders } from "$lib/utils";
 	import type { TileConfig } from "$lib/constants/collage-templates";
-	import { mediaQueryStore } from "$lib/stores";
+	import { exporting, mediaQueryStore } from "$lib/stores";
 	import Filters from "$lib/components/filters.svelte";
 	import Slider from "$lib/components/slider.svelte";
 	import { getFilterString } from "$lib/stores/filter-store.svelte";
@@ -202,7 +197,7 @@
 		link.href = dataURL;
 		link.download = "collage.png";
 		link.click();
-		exportingCollage.set(false);
+		exporting.set(false);
 		tr.show();
 	};
 
@@ -218,7 +213,7 @@
 	{#if !$lgViewport}
 		<div class="flex p-2">
 			<button
-				disabled={$exportingCollage}
+				disabled={$exporting}
 				onclick={handleDownload}
 				class="rounded-md bg-rose-500 px-3 text-sm font-semibold disabled:bg-base-600"
 			>
@@ -239,7 +234,7 @@
 		>
 			<div
 				id="stage-container"
-				class="bg-base-800 {$exportingCollage && 'opacity-0'}"
+				class="bg-base-800 {$exporting && 'opacity-0'}"
 				bind:clientWidth={containerWidth}
 				bind:clientHeight={containerHeight}
 			></div>
@@ -347,7 +342,7 @@
 					class="flex flex-col border-t border-base-800 p-2 lg:mt-auto lg:w-full"
 				>
 					<button
-						disabled={$exportingCollage}
+						disabled={$exporting}
 						onclick={handleDownload}
 						class="h-fit rounded-lg bg-rose-500 p-2 font-medium disabled:bg-base-600"
 					>
@@ -358,4 +353,4 @@
 		</Panel>
 	</div>
 </div>
-<LoadingOverlay loading={$exportingCollage} />
+<LoadingOverlay loading={$exporting} />
