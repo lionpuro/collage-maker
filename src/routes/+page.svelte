@@ -1,15 +1,17 @@
 <script lang="ts">
-	import Panel from "$lib/components/panel.svelte";
-	import Header from "$lib/components/header.svelte";
-	import LoadingOverlay from "$lib/components/loading-overlay.svelte";
+	import {
+		Panel,
+		Header,
+		LoadingOverlay,
+		Filters,
+		Slider,
+	} from "$lib/components";
 	import { collage_templates } from "$lib/constants";
 	import Konva from "konva";
 	import { onMount } from "svelte";
 	import { handleImageUpload, exportCollage, setBorders } from "$lib/utils";
 	import type { TileConfig } from "$lib/constants/collage-templates";
 	import { exporting, mediaQueryStore } from "$lib/stores";
-	import Filters from "$lib/components/filters.svelte";
-	import Slider from "$lib/components/slider.svelte";
 	import { getFilterString } from "$lib/stores/filter-store.svelte";
 	import { resetFilters } from "$lib/stores/filter-store.svelte";
 	const lgViewport = mediaQueryStore("(min-width: 1024px)");
