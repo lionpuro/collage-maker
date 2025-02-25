@@ -13,38 +13,45 @@
 		if (!canvas) {
 			return console.warn("canvas is undefined");
 		}
-		setFilterValue(key, value);
+		setFilterValue(key, (value - 50) * 2);
 		canvas.style.filter = getFilterString();
 	};
+	const fmtValue = (v: number) => ((v - 100) / 2).toString();
 </script>
 
+<datalist id="input-snap" class="hidden">
+	<option value="100"> </option></datalist
+>
 <Slider
 	label="Brightness"
-	displayValue={filterValues.brightness - 100}
+	displayValue={fmtValue(filterValues.brightness)}
 	oninput={(e) => updateFilter("brightness", Number(e.currentTarget.value))}
-	min={0}
-	max={200}
+	min={50}
+	max={150}
 	defaultvalue={100}
 	step={1}
 	{disabled}
+	list="input-snap"
 />
 <Slider
 	label="Contrast"
-	displayValue={filterValues.contrast - 100}
+	displayValue={fmtValue(filterValues.contrast)}
 	oninput={(e) => updateFilter("contrast", Number(e.currentTarget.value))}
-	min={0}
-	max={200}
+	min={50}
+	max={150}
 	defaultvalue={100}
 	step={1}
 	{disabled}
+	list="input-snap"
 />
 <Slider
 	label="Saturation"
-	displayValue={filterValues.saturate - 100}
+	displayValue={fmtValue(filterValues.saturate)}
 	oninput={(e) => updateFilter("saturate", Number(e.currentTarget.value))}
-	min={0}
-	max={200}
+	min={50}
+	max={150}
 	defaultvalue={100}
 	step={1}
 	{disabled}
+	list="input-snap"
 />
