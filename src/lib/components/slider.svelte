@@ -12,7 +12,9 @@
 	<span class="flex justify-between">
 		<h2 class="font-medium">{label}</h2>
 		{#if displayValue}
-			<span class="font-medium">{displayValue.toString()}</span>
+			<span class="font-medium"
+				>{restProps.disabled ? "--" : displayValue.toString()}</span
+			>
 		{/if}
 	</span>
 	<input type="range" {...restProps} />

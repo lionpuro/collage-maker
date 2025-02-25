@@ -9,7 +9,12 @@
 	import { collage_templates } from "$lib/constants";
 	import Konva from "konva";
 	import { onMount } from "svelte";
-	import { handleImageUpload, exportCollage, setBorders } from "$lib/utils";
+	import {
+		handleImageUpload,
+		exportCollage,
+		setBorders,
+		scaleImage,
+	} from "$lib/utils";
 	import type { TileConfig } from "$lib/constants/collage-templates";
 	import { exporting, mediaQueryStore } from "$lib/stores";
 	import { getFilterString } from "$lib/stores/filter-store.svelte";
@@ -17,6 +22,7 @@
 	const lgViewport = mediaQueryStore("(min-width: 1024px)");
 
 	let selectedTemplate = $state<number>(0);
+	let selectedNode = $state<Konva.Node | null>(null);
 	let resolution = $state({ width: 3000, height: 2000 });
 	let orientation = $derived<"square" | "landscape" | "portrait">(
 		resolution.width === resolution.height
@@ -40,14 +46,16 @@
 
 	let fileInput: HTMLInputElement | null = $state(null);
 
-	let imageCount = $state(0);
+	let images = $state<{ id: string; zoom: number }[]>([]);
 
 	const selectNode = (node: Konva.Node | null) => {
 		if (!node) {
 			tr.nodes([]);
+			selectedNode = null;
 			return;
 		}
 		tr.nodes([node]);
+		selectedNode = node;
 	};
 
 	onMount(() => {
@@ -103,7 +111,7 @@
 		borderConfig.width = 0;
 		resetFilters();
 		layer.getCanvas()._canvas.style.filter = "none";
-		imageCount = 0;
+		images = [];
 	};
 
 	const createCell = (conf: TileConfig) => {
@@ -130,8 +138,9 @@
 		});
 		background.on("click tap", () => {
 			if (!fileInput) return;
-			handleImageUpload(fileInput, cell, selectNode);
-			imageCount = imageCount + 1;
+			handleImageUpload(fileInput, cell, selectNode, (img) => {
+				images.push({ id: img.id(), zoom: 100 });
+			});
 		});
 		background.on("mouseenter", (e) => {
 			const container = e.target.getStage()?.container();
@@ -209,6 +218,15 @@
 		}
 		resolution = { width: resolution.height, height: resolution.width };
 	};
+
+	function handleZoom(e: ChangeEvent<HTMLInputElement>) {
+		const zoom = Number(e.currentTarget.value);
+		if (!selectedNode) return;
+		scaleImage(selectedNode, zoom);
+		const index = images.findIndex((img) => img.id === selectedNode?.id());
+		if (index < 0) return;
+		images[index].zoom = zoom;
+	}
 </script>
 
 <Header>
@@ -323,6 +341,31 @@
 				<div
 					class="flex flex-col gap-2 overflow-y-auto max-lg:px-2 lg:content-start"
 				>
+					{#if !selectedNode}
+						<Slider
+							label="Zoom"
+							displayValue={100 + "%"}
+							min={100}
+							max={400}
+							step={1}
+							value={100}
+							disabled={true}
+						/>
+					{:else}
+						{#each images as image}
+							{#if selectedNode?.id() === image.id}
+								<Slider
+									label="Zoom"
+									displayValue={image.zoom + "%"}
+									min={100}
+									max={400}
+									step={1}
+									value={image.zoom}
+									oninput={handleZoom}
+								/>
+							{/if}
+						{/each}
+					{/if}
 					<Slider
 						label="Border"
 						displayValue={Math.round((borderConfig.width / 40) * 100) + "%"}
@@ -334,7 +377,7 @@
 					/>
 					<Filters
 						canvas={layer.getCanvas()._canvas}
-						disabled={imageCount <
+						disabled={images.length <
 							collage_templates[selectedTemplate].config.length}
 					/>
 				</div>

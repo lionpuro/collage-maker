@@ -36,6 +36,7 @@
 		"vite": "^6.0.0"
 	},
 	"dependencies": {
-		"konva": "^9.3.18"
+		"konva": "^9.3.18",
+		"nanoid": "^5.1.0"
 	}
 }
