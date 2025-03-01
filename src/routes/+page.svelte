@@ -229,8 +229,8 @@
 	}
 </script>
 
-<Header>
-	{#if !$lgViewport}
+{#if !$lgViewport}
+	<Header>
 		<div class="flex p-2">
 			<button
 				disabled={$exporting}
@@ -240,8 +240,8 @@
 				Download
 			</button>
 		</div>
-	{/if}
-</Header>
+	</Header>
+{/if}
 <div class="flex h-full min-h-0 flex-col lg:flex-row-reverse">
 	<div
 		class="flex h-full min-h-0 w-full min-w-0 flex-col bg-[#1d1d20] p-1 lg:p-4"
