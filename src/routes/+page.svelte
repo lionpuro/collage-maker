@@ -274,7 +274,7 @@
 						<span class="flex w-full items-center rounded-md">
 							<input
 								id="width"
-								class="w-full rounded-md border border-base-700 bg-transparent px-2 py-0.5 font-medium"
+								class="w-full rounded-md border border-base-700 bg-transparent px-2 py-0.5 font-medium outline-2 -outline-offset-2 outline-blue-500 focus:outline"
 								type="numeric"
 								value={resolution.width}
 								onchange={(e) =>
@@ -288,7 +288,7 @@
 						<span class="flex w-full items-center rounded-md">
 							<input
 								id="height"
-								class="w-full rounded-md border border-base-700 bg-transparent px-2 py-0.5 font-medium"
+								class="w-full rounded-md border border-base-700 bg-transparent px-2 py-0.5 font-medium outline-2 -outline-offset-2 outline-blue-500 focus:outline"
 								type="numeric"
 								value={resolution.height}
 								onchange={(e) =>
