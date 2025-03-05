@@ -1,57 +1,95 @@
 <script lang="ts">
-	import Slider from "$lib/components/slider.svelte";
-	import { filterValues } from "$lib/stores";
+	import { Slider } from "$lib/components";
+	import { filterValues, mediaQueryStore } from "$lib/stores";
 	import {
 		getFilterString,
 		setFilterValue,
 		type FilterKey,
 	} from "$lib/stores/filter-store.svelte";
-	let { canvas, disabled }: { canvas: HTMLCanvasElement; disabled: boolean } =
-		$props();
+	const smallLayout = mediaQueryStore("(max-width: 768px)");
+
+	type Props = {
+		canvas: HTMLCanvasElement;
+		disabled: boolean;
+	};
+	let { canvas, disabled }: Props = $props();
+
+	let currentFilter = $state<null | FilterKey>(null);
 
 	const updateFilter = (key: FilterKey, value: number) => {
 		if (!canvas) {
 			return console.warn("canvas is undefined");
 		}
-		setFilterValue(key, (value - 50) * 2);
+		setFilterValue(key, value);
 		canvas.style.filter = getFilterString();
 	};
-	const fmtValue = (v: number) => ((v - 100) / 2).toString();
+	const fmtValue = (v: number) => (v - 100).toString();
+
+	const filters: { key: FilterKey; name: string }[] = [
+		{ key: "brightness", name: "Brightness" },
+		{ key: "contrast", name: "Contrast" },
+		{ key: "saturate", name: "Saturation" },
+	];
 </script>
 
+{#if $smallLayout}
+	<span class="font-semibold">Adjust</span>
+{/if}
+{#each filters as filter}
+	<div
+		class="flex gap-4 md:flex-col
+		{$smallLayout && currentFilter !== filter.key && 'hidden'}"
+	>
+		{#if $smallLayout && currentFilter === filter.key}
+			<button
+				class="flex flex-col items-center justify-center rounded-md bg-base-800 px-4 font-medium"
+				onclick={() => (currentFilter = null)}
+			>
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					viewBox="0 -960 960 960"
+					width="28px"
+					height="28px"
+					fill="currentColor"
+				>
+					<path d="M560-240 320-480l240-240 56 56-184 184 184 184-56 56Z" />
+				</svg>
+				Back
+			</button>
+		{/if}
+		{#if !$smallLayout || currentFilter === filter.key}
+			<Slider
+				label={filter.name}
+				displayValue={fmtValue(filterValues[filter.key])}
+				oninput={(e) => updateFilter(filter.key, Number(e.currentTarget.value))}
+				min={50}
+				max={150}
+				value={filterValues[filter.key]}
+				step={1}
+				{disabled}
+				list="input-snap"
+				className={$smallLayout && currentFilter === filter.key
+					? "w-full border-none pb-2"
+					: ""}
+			/>
+		{/if}
+	</div>
+{/each}
 <datalist id="input-snap" class="hidden">
-	<option value="100"> </option></datalist
->
-<Slider
-	label="Brightness"
-	displayValue={fmtValue(filterValues.brightness)}
-	oninput={(e) => updateFilter("brightness", Number(e.currentTarget.value))}
-	min={50}
-	max={150}
-	defaultvalue={100}
-	step={1}
-	{disabled}
-	list="input-snap"
-/>
-<Slider
-	label="Contrast"
-	displayValue={fmtValue(filterValues.contrast)}
-	oninput={(e) => updateFilter("contrast", Number(e.currentTarget.value))}
-	min={50}
-	max={150}
-	defaultvalue={100}
-	step={1}
-	{disabled}
-	list="input-snap"
-/>
-<Slider
-	label="Saturation"
-	displayValue={fmtValue(filterValues.saturate)}
-	oninput={(e) => updateFilter("saturate", Number(e.currentTarget.value))}
-	min={50}
-	max={150}
-	defaultvalue={100}
-	step={1}
-	{disabled}
-	list="input-snap"
-/>
+	<option value="100"></option>
+</datalist>
+{#if $smallLayout && !currentFilter}
+	<div class="flex justify-center">
+		{#each filters as filter}
+			<button
+				class="flex flex-col items-center rounded-md p-3 px-4 text-sm"
+				onclick={() => (currentFilter = filter.key)}
+			>
+				<span class="text-base font-bold">
+					{fmtValue(filterValues[filter.key])}
+				</span>
+				{filter.name}
+			</button>
+		{/each}
+	</div>
+{/if}
