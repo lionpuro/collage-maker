@@ -16,7 +16,7 @@
 		setBorders,
 		scaleImage,
 	} from "$lib/utils";
-	import type { TileConfig } from "$lib/constants/collage-templates";
+	import type { TileConfig } from "$lib/types";
 	import { exporting, mediaQueryStore } from "$lib/stores";
 	import { getFilterString } from "$lib/stores/filter-store.svelte";
 	import { resetFilters } from "$lib/stores/filter-store.svelte";
