@@ -179,6 +179,12 @@
 		});
 	});
 
+	const calcScale = () =>
+		Math.min(
+			wrapperSize.width / resolution.width,
+			wrapperSize.height / resolution.height,
+		);
+
 	const resizeCanvas = () => {
 		const scale = Math.min(
 			wrapperSize.width / resolution.width,
@@ -194,7 +200,7 @@
 	};
 
 	const changeBorderWidth = (e: ChangeEvent<HTMLInputElement>) => {
-		const width = Number(e.currentTarget.value) * 10;
+		const width = Math.round((Number(e.currentTarget.value) * 4) / calcScale());
 		borderConfig.width = Number(e.currentTarget.value);
 		setBorders(resolution, borderGroup, width, borderConfig.color);
 	};
