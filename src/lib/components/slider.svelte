@@ -9,7 +9,7 @@
 	let { label, displayValue, className, ...restProps }: Props = $props();
 </script>
 
-<div class="flex flex-col gap-2 border-b border-base-800 pb-4 {className}">
+<div class="flex flex-col gap-2 {className}">
 	{#if label}
 		<span class="flex justify-between">
 			<h2 class="font-medium">{label}</h2>

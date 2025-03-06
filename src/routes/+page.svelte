@@ -1,6 +1,7 @@
 <script lang="ts">
 	import {
 		Panel,
+		PanelSection,
 		Header,
 		LoadingOverlay,
 		Filters,
@@ -268,78 +269,92 @@
 	>
 		<Panel>
 			{#snippet collageTab()}
-				<div class="flex gap-2">
-					<div class="flex basis-1/2 flex-col gap-2">
-						<label for="width" class="text-sm font-medium">Width</label>
-						<span class="flex w-full items-center rounded-md">
-							<input
-								id="width"
-								class="w-full rounded-md border border-base-700 bg-transparent px-2 py-0.5 font-medium outline-2 -outline-offset-2 outline-blue-500 focus:outline"
-								type="numeric"
-								value={resolution.width}
-								onchange={(e) =>
-									(resolution.width = Number(e.currentTarget.value))}
-							/>
-						</span>
-					</div>
+				<PanelSection heading="Canvas">
+					<div class="flex flex-col gap-4">
+						<div class="flex gap-2">
+							<div class="flex basis-1/2 flex-col gap-2">
+								<label for="width" class="text-sm font-medium">Width</label>
+								<span class="flex w-full items-center rounded-md">
+									<input
+										id="width"
+										class="w-full rounded-md border border-base-700 bg-transparent px-2 py-0.5 font-medium outline-2 -outline-offset-2 outline-blue-500 focus:outline"
+										type="numeric"
+										value={resolution.width}
+										onchange={(e) =>
+											(resolution.width = Number(e.currentTarget.value))}
+									/>
+								</span>
+							</div>
 
-					<div class="flex basis-1/2 flex-col gap-2">
-						<label for="height" class="text-sm font-medium">Height</label>
-						<span class="flex w-full items-center rounded-md">
-							<input
-								id="height"
-								class="w-full rounded-md border border-base-700 bg-transparent px-2 py-0.5 font-medium outline-2 -outline-offset-2 outline-blue-500 focus:outline"
-								type="numeric"
-								value={resolution.height}
-								onchange={(e) =>
-									(resolution.height = Number(e.currentTarget.value))}
-							/>
-						</span>
+							<div class="flex basis-1/2 flex-col gap-2">
+								<label for="height" class="text-sm font-medium">Height</label>
+								<span class="flex w-full items-center rounded-md">
+									<input
+										id="height"
+										class="w-full rounded-md border border-base-700 bg-transparent px-2 py-0.5 font-medium outline-2 -outline-offset-2 outline-blue-500 focus:outline"
+										type="numeric"
+										value={resolution.height}
+										onchange={(e) =>
+											(resolution.height = Number(e.currentTarget.value))}
+									/>
+								</span>
+							</div>
+						</div>
+						<div class="flex flex-col gap-2">
+							<span class="text-sm font-medium">Orientation</span>
+							<div
+								class="flex gap-0.5 overflow-hidden rounded-md bg-base-800 p-0.5"
+							>
+								<button
+									disabled={orientation === "square"}
+									class="flex basis-1/2 items-center justify-center rounded py-1
+									text-sm font-medium disabled:bg-base-800 disabled:text-base-500
+									{orientation === 'landscape' && 'bg-rose-500'}"
+									onclick={() => changeOrientation("landscape")}
+								>
+									Landscape
+								</button>
+								<button
+									disabled={orientation === "square"}
+									class="flex basis-1/2 items-center justify-center rounded py-1
+									text-sm font-medium disabled:bg-base-800 disabled:text-base-500
+									{orientation === 'portrait' && 'bg-rose-500'}"
+									onclick={() => changeOrientation("portrait")}
+								>
+									Portrait
+								</button>
+							</div>
+						</div>
+						<Slider
+							label="Border"
+							displayValue={Math.round((borderConfig.width / 40) * 100) + "%"}
+							min={0}
+							max={40}
+							step={0.4}
+							value={borderConfig.width}
+							oninput={changeBorderWidth}
+						/>
 					</div>
-				</div>
-				<div class="flex flex-col gap-2">
-					<span class="text-sm font-medium">Orientation</span>
+				</PanelSection>
+				<PanelSection heading="Layout">
 					<div
-						class="flex gap-0.5 overflow-hidden rounded-md bg-base-800 p-0.5"
+						class="flex max-h-16 flex-wrap gap-2 max-lg:flex-col max-lg:overflow-x-auto sm:max-h-36 lg:max-h-none lg:content-start"
 					>
-						<button
-							disabled={orientation === "square"}
-							class="flex basis-1/2 items-center justify-center rounded py-1
-							text-sm font-medium disabled:bg-base-800 disabled:text-base-500
-							{orientation === 'landscape' && 'bg-rose-500'}"
-							onclick={() => changeOrientation("landscape")}
-						>
-							Landscape
-						</button>
-						<button
-							disabled={orientation === "square"}
-							class="flex basis-1/2 items-center justify-center rounded py-1
-							text-sm font-medium disabled:bg-base-800 disabled:text-base-500
-							{orientation === 'portrait' && 'bg-rose-500'}"
-							onclick={() => changeOrientation("portrait")}
-						>
-							Portrait
-						</button>
+						{#each collage_templates as template, index}
+							<button
+								onclick={() => (selectedTemplate = index)}
+								class="flex items-center justify-center rounded-lg p-4 hover:bg-base-800 hover:bg-opacity-50 max-lg:flex-col max-sm:h-full sm:h-[calc(50%-0.25rem)] lg:aspect-square lg:h-auto lg:w-[calc(50%-0.25rem)]
+								{selectedTemplate === index && 'bg-base-800'}"
+							>
+								<img src={template.icon} alt={template.name} />
+							</button>
+						{/each}
 					</div>
-				</div>
-				<span class="font-semibold">Layout</span>
-				<div
-					class="flex max-h-16 flex-wrap gap-2 max-lg:flex-col max-lg:overflow-x-auto sm:max-h-36 lg:max-h-none lg:content-start"
-				>
-					{#each collage_templates as template, index}
-						<button
-							onclick={() => (selectedTemplate = index)}
-							class="flex items-center justify-center rounded-lg p-4 hover:bg-base-800 hover:bg-opacity-50 max-lg:flex-col max-sm:h-full sm:h-[calc(50%-0.25rem)] lg:aspect-square lg:h-auto lg:w-[calc(50%-0.25rem)]
-							{selectedTemplate === index && 'bg-base-800'}"
-						>
-							<img src={template.icon} alt={template.name} />
-						</button>
-					{/each}
-				</div>
+				</PanelSection>
 			{/snippet}
 			{#snippet editTab()}
 				<div
-					class="flex flex-col gap-2 overflow-y-auto max-lg:px-2 lg:content-start"
+					class="flex flex-col gap-2 overflow-y-auto p-4 max-lg:px-6 lg:content-start"
 				>
 					{#if !selectedNode}
 						<Slider
@@ -350,6 +365,7 @@
 							step={1}
 							value={100}
 							disabled={true}
+							className={"border-b border-base-800 pb-4"}
 						/>
 					{:else}
 						{#each images as image}
@@ -362,19 +378,11 @@
 									step={1}
 									value={image.zoom}
 									oninput={handleZoom}
+									className={"border-b border-base-800 pb-4"}
 								/>
 							{/if}
 						{/each}
 					{/if}
-					<Slider
-						label="Border"
-						displayValue={Math.round((borderConfig.width / 40) * 100) + "%"}
-						min={0}
-						max={40}
-						step={0.4}
-						value={borderConfig.width}
-						oninput={changeBorderWidth}
-					/>
 					<Filters
 						canvas={layer.getCanvas()._canvas}
 						disabled={images.length <
@@ -384,7 +392,7 @@
 			{/snippet}
 			{#if $lgViewport}
 				<div
-					class="flex flex-col border-t border-base-800 p-2 lg:mt-auto lg:w-full"
+					class="flex flex-col border-t border-base-800 p-3 lg:mt-auto lg:w-full"
 				>
 					<button
 						disabled={$exporting}

@@ -68,9 +68,9 @@
 				step={1}
 				{disabled}
 				list="input-snap"
-				className={$smallLayout && currentFilter === filter.key
-					? "w-full border-none pb-2"
-					: ""}
+				className={`border-b border-base-800 pb-4
+					${$smallLayout && currentFilter === filter.key ? "w-full border-none pb-2" : ""}
+				`}
 			/>
 		{/if}
 	</div>
