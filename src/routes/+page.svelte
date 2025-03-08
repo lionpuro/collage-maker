@@ -179,12 +179,6 @@
 		});
 	});
 
-	const calcScale = () =>
-		Math.min(
-			wrapperSize.width / resolution.width,
-			wrapperSize.height / resolution.height,
-		);
-
 	const resizeCanvas = () => {
 		const scale = Math.min(
 			wrapperSize.width / resolution.width,
@@ -200,8 +194,10 @@
 	};
 
 	const changeBorderWidth = (e: ChangeEvent<HTMLInputElement>) => {
-		const width = Math.round((Number(e.currentTarget.value) * 4) / calcScale());
-		borderConfig.width = Number(e.currentTarget.value);
+		const val = Number(e.currentTarget.value);
+		borderConfig.width = val;
+		const length = Math.max(resolution.width, resolution.height);
+		const width = Math.round((length * (val / 100)) | 0);
 		setBorders(resolution, borderGroup, width, borderConfig.color);
 	};
 
@@ -333,10 +329,10 @@
 						</div>
 						<Slider
 							label="Border"
-							displayValue={Math.round((borderConfig.width / 40) * 100) + "%"}
+							displayValue={(borderConfig.width * 4).toString()}
 							min={0}
-							max={40}
-							step={0.4}
+							max={12.5}
+							step={0.25}
 							value={borderConfig.width}
 							oninput={changeBorderWidth}
 						/>
