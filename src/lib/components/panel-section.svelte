@@ -7,9 +7,7 @@
 	let open = $state(true);
 </script>
 
-<div
-	class="flex flex-col border-base-800 p-4 max-lg:px-6 [&:not(:last-child)]:border-b"
->
+<div class="flex flex-col border-b border-base-800 p-4 max-lg:px-6">
 	<div class="flex justify-between font-semibold">
 		{heading}
 		<button

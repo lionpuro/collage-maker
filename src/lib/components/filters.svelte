@@ -6,7 +6,7 @@
 		setFilterValue,
 		type FilterKey,
 	} from "$lib/stores/filter-store.svelte";
-	const smallLayout = mediaQueryStore("(max-width: 768px)");
+	const smallLayout = mediaQueryStore("(max-width: 640px)");
 
 	type Props = {
 		canvas: HTMLCanvasElement;
@@ -32,17 +32,14 @@
 	];
 </script>
 
-{#if $smallLayout}
-	<span class="font-semibold">Adjust</span>
-{/if}
 {#each filters as filter}
 	<div
-		class="flex gap-4 md:flex-col
+		class="flex gap-4 max-sm:items-center sm:flex-col
 		{$smallLayout && currentFilter !== filter.key && 'hidden'}"
 	>
 		{#if $smallLayout && currentFilter === filter.key}
 			<button
-				class="flex flex-col items-center justify-center rounded-md bg-base-800 px-4 font-medium"
+				class="flex flex-col items-center justify-center rounded-md bg-base-800 px-4 py-2 font-medium"
 				onclick={() => (currentFilter = null)}
 			>
 				<svg
@@ -69,7 +66,7 @@
 				{disabled}
 				list="input-snap"
 				className={`border-b border-base-800 pb-4
-					${$smallLayout && currentFilter === filter.key ? "w-full border-none pb-2" : ""}
+					${$smallLayout && currentFilter === filter.key ? "w-full border-none pb-0" : ""}
 				`}
 			/>
 		{/if}

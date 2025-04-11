@@ -1,45 +1,93 @@
 <script lang="ts">
+	import { Icon } from "svelte-icons-pack";
+	import { IconLayout, IconFrame, IconPicture, IconSliders } from "$lib/icons";
+	import { PanelTab } from "$lib/components";
 	import type { Snippet } from "svelte";
+	import { mediaQueryStore } from "$lib/stores";
+	import Section from "./panel-section.svelte";
+	type TabKey = "canvas" | "layout" | "image" | "adjust";
+	let currentTab = $state<TabKey>("canvas");
+
+	const setTab = (t: TabKey) => (currentTab = t);
 	let {
-		collageTab,
-		editTab,
+		canvasTab,
+		layoutTab,
+		imageTab,
+		adjustTab,
 		children,
 	}: {
-		collageTab: Snippet;
-		editTab: Snippet;
-		children: Snippet;
+		canvasTab: Snippet;
+		layoutTab: Snippet;
+		imageTab: Snippet;
+		adjustTab: Snippet;
+		children?: Snippet;
 	} = $props();
-	let currentTab = $state<"collage" | "edit">("collage");
 
-	const activeClass = `
-	relative after:absolute after:left-0 after:bottom-0
-	after:content-['_'] after:bg-rose-500 after:h-0.5 after:w-full`;
+	const lgViewport = mediaQueryStore("(min-width: 1024px)");
 </script>
 
 <div class="flex h-full flex-col">
-	<div class="flex border-b border-base-800">
-		<button
-			onclick={() => (currentTab = "collage")}
-			class="basis-1/2 p-2 font-medium
-				{currentTab === 'collage' ? activeClass : 'text-base-400'}"
-		>
-			Collage
-		</button>
-		<button
-			onclick={() => (currentTab = "edit")}
-			class="basis-1/2 p-2 font-medium
-				{currentTab === 'edit' ? activeClass : 'text-base-400'}"
-		>
-			Edit
-		</button>
-	</div>
-	<div class="flex flex-col overflow-y-auto">
-		{#if currentTab === "collage"}
-			{@render collageTab()}
-		{/if}
-		{#if currentTab === "edit"}
-			{@render editTab()}
-		{/if}
-	</div>
-	{@render children()}
+	{#if $lgViewport}
+		<div class="flex flex-col overflow-y-auto">
+			<Section heading="Canvas">
+				{@render canvasTab()}
+			</Section>
+			<Section heading="Layout">
+				{@render layoutTab()}
+			</Section>
+			<Section heading="Image">
+				{@render imageTab()}
+			</Section>
+			<Section heading="Adjust">
+				{@render adjustTab()}
+			</Section>
+		</div>
+		{@render children?.()}
+	{:else}
+		<div class="flex flex-col border-t border-base-800">
+			{#if currentTab === "canvas"}
+				{@render canvasTab()}
+			{:else}
+				<div class="flex h-24 flex-col justify-center sm:h-auto">
+					{#if currentTab === "layout"}
+						{@render layoutTab()}
+					{/if}
+					{#if currentTab === "image"}
+						{@render imageTab()}
+					{/if}
+					{#if currentTab === "adjust"}
+						{@render adjustTab()}
+					{/if}
+				</div>
+			{/if}
+		</div>
+
+		<div class="flex gap-2 border-t border-base-800 p-1 px-4">
+			<PanelTab
+				active={currentTab === "canvas"}
+				onclick={() => setTab("canvas")}
+			>
+				<Icon src={IconFrame} className="size-6 sm:size-4" />
+				Canvas
+			</PanelTab>
+			<PanelTab
+				active={currentTab === "layout"}
+				onclick={() => setTab("layout")}
+			>
+				<Icon src={IconLayout} className="size-6 sm:size-4" />
+				Layout
+			</PanelTab>
+			<PanelTab active={currentTab === "image"} onclick={() => setTab("image")}>
+				<Icon src={IconPicture} className="size-6 sm:size-4" />
+				Image
+			</PanelTab>
+			<PanelTab
+				active={currentTab === "adjust"}
+				onclick={() => setTab("adjust")}
+			>
+				<Icon src={IconSliders} className="size-6 sm:size-4" />
+				Adjust
+			</PanelTab>
+		</div>
+	{/if}
 </div>
