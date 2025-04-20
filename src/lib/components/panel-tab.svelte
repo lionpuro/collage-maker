@@ -13,7 +13,7 @@
 </script>
 
 <button
-	class="relative flex grow basis-1 flex-col items-center justify-center gap-2 rounded-lg p-4 text-sm font-medium sm:flex-row sm:gap-4 {className} {active
+	class="relative flex grow basis-1 flex-col items-center justify-center gap-2 rounded-lg p-3 text-sm font-medium sm:flex-row sm:gap-4 {className} {active
 		? 'text-base-50'
 		: 'text-base-400'}"
 	{...props}

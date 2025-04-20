@@ -62,30 +62,30 @@
 			{/if}
 		</div>
 
-		<div class="flex gap-2 border-t border-base-800 p-1 px-4">
+		<div class="flex gap-2 border-t border-base-800 px-4">
 			<PanelTab
 				active={currentTab === "canvas"}
 				onclick={() => setTab("canvas")}
 			>
-				<Icon src={IconFrame} className="size-6 sm:size-4" />
+				<Icon src={IconFrame} className="size-5 sm:size-4" />
 				Canvas
 			</PanelTab>
 			<PanelTab
 				active={currentTab === "layout"}
 				onclick={() => setTab("layout")}
 			>
-				<Icon src={IconLayout} className="size-6 sm:size-4" />
+				<Icon src={IconLayout} className="size-5 sm:size-4" />
 				Layout
 			</PanelTab>
 			<PanelTab active={currentTab === "image"} onclick={() => setTab("image")}>
-				<Icon src={IconPicture} className="size-6 sm:size-4" />
+				<Icon src={IconPicture} className="size-5 sm:size-4" />
 				Image
 			</PanelTab>
 			<PanelTab
 				active={currentTab === "adjust"}
 				onclick={() => setTab("adjust")}
 			>
-				<Icon src={IconSliders} className="size-6 sm:size-4" />
+				<Icon src={IconSliders} className="size-5 sm:size-4" />
 				Adjust
 			</PanelTab>
 		</div>
